@@ -74,12 +74,12 @@ ArrayType = ArrayType LBRACKET RBRACKET
 		| ID LBRACKET RBRACKET
 		;
 
-ParameterList = Parameters
+ParameterList = Parameter ParameterT
 		|
 		;
 		
-Parameters = Parameter COMMA Parameters
-		| Parameter
+ParameterT = COMMA Parameter ParameterT
+		|
 		;
 		
 Parameter = TypeName ID;
@@ -115,13 +115,13 @@ ReturnState = RETURN SEMICOLON
 
 ExprState = Expr SEMICOLON;
 
-Exprs = Expr Exprs
+Exprs = NonEmptyExprs 
 		|
 		;
 
 NonEmptyExprs = Expr NonEmptyExprsA;
 
-NonEmptyExprsA = NonEmptyExprs 
+NonEmptyExprsA = COMMA Expr NonEmptyExprsA 
 		|
 		;
 		
@@ -137,30 +137,37 @@ LHSExprT = LBRACKET Expr RBRACKET LHSExprT
 		|
 		;
 
-RHSExpr = ArExpr RHSExprA;
-		
-RHSExprA = EQEQ ArExpr
-		| NEQ ArExpr
-		| LT ArExpr
-		| LEQ ArExpr
-		| GT ArExpr
-		| GEQ ArExpr
-		| 
+RHSExpr = ArExpr
+		| ArExpr ComOp ArExpr
+		;
+
+ComOp = EQEQ
+		| NEQ
+		| LT
+		| LEQ
+		| GT
+		| GEQ
 		;
 		
 ArExpr = Term ArExprA;
 		
-ArExprA = PLUS ArExpr
-		| MINUS ArExpr
+ArExprA = AddOp Term ArExprA
 		|
+		;
+		
+AddOp = PLUS
+		| MINUS
 		;
 
 Term = Factor TermA;
 
-TermA = TIMES Term
-		| DIV Term
-		| MOD Term
+TermA = MulOp Factor TermA
 		|
+		;
+
+MulOp = TIMES
+		| DIV
+		| MOD
 		;
 
 Factor = MINUS Factor
@@ -179,7 +186,7 @@ PrimaryExpr = LHSExpr
 		
 FunctionCall = ID LPAREN Exprs RPAREN;
 
-ArrayExpr = LBRACKET NonEmptyExprs COMMA RBRACKET;
+ArrayExpr = LBRACKET NonEmptyExprs RBRACKET;
 
 ParExpr = LPAREN Expr RPAREN;
 
