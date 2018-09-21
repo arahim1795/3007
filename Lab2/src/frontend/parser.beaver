@@ -35,12 +35,12 @@
 
 Module = MODULE ID LCURLY Imports Declarations RCURLY;
 
-Imports = Imports Import
+Imports = Import Imports
 		|
 		;
 Import = IMPORT ID SEMICOLON;
 
-Declarations = Declarations Declaration
+Declarations = Declaration Declarations
 		|
 		;
 
@@ -78,13 +78,13 @@ ParameterList = Parameters
 		|
 		;
 		
-Parameters = Parameters COMMA Parameter
+Parameters = Parameter COMMA Parameters
 		| Parameter
 		;
 		
 Parameter = TypeName ID;
 
-Statements = Statements Statement
+Statements = Statement Statements
 		|
 		;
 		
@@ -115,12 +115,14 @@ ReturnState = RETURN SEMICOLON
 
 ExprState = Expr SEMICOLON;
 
-Exprs = Exprs Expr
+Exprs = Expr Exprs
 		|
 		;
 
-NonEmptyExprs = NonEmptyExprs Expr
-		| Expr
+NonEmptyExprs = Expr NonEmptyExprsA;
+
+NonEmptyExprsA = NonEmptyExprs 
+		|
 		;
 		
 Expr = Assignment
@@ -129,29 +131,36 @@ Expr = Assignment
 
 Assignment = LHSExpr EQL Expr;
 
-LHSExpr = ID | ArrayAccess;
+LHSExpr = ID LHSExprT;
 
-ArrayAccess = ArrayAccess LBRACKET Expr RBRACKET
-		| ID LBRACKET Expr RBRACKET;
-		
-RHSExpr = ArExpr EQEQ ArExpr
-		| ArExpr NEQ ArExpr
-		| ArExpr LT ArExpr
-		| ArExpr LEQ ArExpr
-		| ArExpr GT ArExpr
-		| ArExpr GEQ ArExpr
-		| ArExpr
-		;
-		
-ArExpr = ArExpr PLUS Term 
-		| ArExpr MINUS Term 
-		| Term
+LHSExprT = LBRACKET Expr RBRACKET LHSExprT
+		|
 		;
 
-Term = Term TIMES Factor 
-		| Term DIV Factor
-		| Term MOD Factor
-		| Factor
+RHSExpr = ArExpr RHSExprA;
+		
+RHSExprA = EQEQ ArExpr
+		| NEQ ArExpr
+		| LT ArExpr
+		| LEQ ArExpr
+		| GT ArExpr
+		| GEQ ArExpr
+		| 
+		;
+		
+ArExpr = Term ArExprA;
+		
+ArExprA = PLUS ArExpr
+		| MINUS ArExpr
+		|
+		;
+
+Term = Factor TermA;
+
+TermA = TIMES Term
+		| DIV Term
+		| MOD Term
+		|
 		;
 
 Factor = MINUS Factor
